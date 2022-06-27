@@ -1,10 +1,16 @@
 package client;
 
+import client.controllers.ViewController;
+import client.model.ContractModel;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.json.JSONArray;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -18,8 +24,11 @@ import java.util.stream.Collectors;
  */
 public class Main extends Application {
 
+    private static final String SAMPLE_FXML_PATH = "/sample.fxml";
     private NetworkConnector network;
     private HttpURLConnection connection;
+    public Stage primaryStage;
+    private ViewController controller;
 
     public static void main(String[] args) {
         launch(args);
@@ -27,23 +36,23 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        List<String> contractIds = new ArrayList<>();
-        List<String> contractDates = new ArrayList<>();
-        List<String> contractUpdateDates = new ArrayList<>();
-        List<String> contractCheckBox = new ArrayList<>();
+        this.primaryStage = primaryStage;
         network = new NetworkConnector();
-        connection =  (HttpURLConnection )network.connect();
-        InputStream in = connection.getInputStream();
-        String data = new BufferedReader(new InputStreamReader(in))
-                .lines()
-                .collect(Collectors.joining());
-        JSONArray jsons = new JSONArray(data);
-        for (Object json : jsons) {
-            System.out.println(json);
-        }
-        in.close();
-        connection.disconnect();
-        System.exit(0);
+
+        createDialogWindow(primaryStage);
+    }
+
+    private void createDialogWindow(Stage primaryStage) throws IOException {
+        FXMLLoader mainLoader = new FXMLLoader();
+        mainLoader.setLocation(Main.class.getResource(SAMPLE_FXML_PATH));
+
+        Parent root = mainLoader.load();
+
+        primaryStage.setTitle("Messenger");
+        primaryStage.setScene(new Scene(root, 600, 400));
+
+        controller = mainLoader.getController();
+        primaryStage.show();
     }
 
 }
